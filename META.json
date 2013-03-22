@@ -1,0 +1,58 @@
+{
+   "abstract" : "add a pod section with multiple authors, copyright owners and licenses in a file basis",
+   "author" : [
+      "Carn\u00c3\u00ab Draug <cdraug@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pod-Weaver-Section-Legal-Complicated",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::MoreUtils" : "0",
+            "Moose" : "0",
+            "Moose::Autobox" : "0",
+            "MooseX::Types::Moose" : "0",
+            "Pod::Weaver::Role::Section" : "0",
+            "namespace::autoclean" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "cdraug@cpan.org",
+         "web" : "https://github.com/carandraug/pod-weaver-section-legal-complicated/issues"
+      },
+      "homepage" : "https://github.com/carandraug/pod-weaver-section-legal-complicated",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/carandraug/pod-weaver-section-legal-complicated.git",
+         "web" : "https://github.com/carandraug/pod-weaver-section-legal-complicated"
+      }
+   },
+   "version" : "1.00",
+   "x_authority" : "cpan:CDRAUG"
+}
+
