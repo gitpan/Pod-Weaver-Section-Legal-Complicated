@@ -3,8 +3,9 @@ BEGIN {
   $Pod::Weaver::Section::Legal::Complicated::AUTHORITY = 'cpan:CDRAUG';
 }
 {
-  $Pod::Weaver::Section::Legal::Complicated::VERSION = '1.00';
+  $Pod::Weaver::Section::Legal::Complicated::VERSION = '1.20';
 }
+use utf8;
 ## Copyright (C) 2013 Carnë Draug <carandraug+dev@gmail.com>
 ##
 ## This program is free software; you can redistribute it and/or modify
@@ -27,10 +28,12 @@ BEGIN {
 
 use strict;
 use warnings;
+use Module::Load;
 use Moose;
-use Moose::Autobox;
 use MooseX::Types::Moose qw(Bool Int);
 use List::MoreUtils qw(uniq);
+use Pod::Elemental::Element::Nested;
+use Pod::Elemental::Element::Pod5::Ordinary;
 with (
   'Pod::Weaver::Role::Section',
 );
@@ -62,12 +65,24 @@ sub _extract_comments {
   $ppi_document->find( sub {
     my $ppi_node = $_[1];
     if ($ppi_node->isa('PPI::Token::Comment') &&
-        $ppi_node->content =~ qr/^\s*#+\s*$tag:\s*(.+)$/m ) {
+        $ppi_node->content =~ qr/^\s*#+\s*$tag:\s*(.+?)\s*$/m ) {
       push (@comments, $1);
     }
     return 0;
   });
   return @comments;
+}
+
+
+sub _join {
+  my $text;
+  if (@_ == 1) {
+    $text = $_[0];
+  } else {
+    $text  = join (", ", @_[0 .. $#_ -1]);
+    $text .= ", and $_[-1]";
+  }
+  return $text;
 }
 
 
@@ -81,7 +96,12 @@ sub weave_section {
 
   @licenses  = map {
     my $license = "Software::License::$_";
-    eval { $license = $license->new({holder => \@owners}) };
+    eval {
+      load $license;
+      ## it doesn't matter who's the holder at this point. We just want the
+      ## pretty text for the license name
+      $license = $license->new({holder => "does not matter"})
+    };
     Carp::croak "Possibly $_ license module not installed: $@" if $@;
     $license;
   } @licenses;
@@ -94,34 +114,43 @@ sub weave_section {
   Carp::croak "Unable to find a copyright owner for $filename" unless scalar (@owners);
   Carp::croak "Unable to find a copyright license for $filename" unless scalar (@licenses);
 
-  my $author_text  = join ("\n\n", @authors);
+  my ($author_text, $license_text);
+
+  $author_text  = join ("\n\n", @authors);
 
   ## One day, we might need a more complex legal text but in the mean
   ## time, this is fine to avoid repeated entries
-  @licenses = uniq (map { $_->name } @licenses);
+  @licenses = uniq (map { lcfirst($_->name) } @licenses);
+  ## and make pretty English with year and owner names
+  @owners = map {
+    my $text;
+    ## there may be spaces and dashes on the years:
+    ##  2003, 2004
+    ##  2006-2007, 2008
+    ##
+    ## so it must start and end with numbers, but in the middle we allow spaces,
+    ## dashes and commas as well.
+    $_ =~ m/^([\d][\d\s\-,]*[\d])?\s*(.+)$/;
+    $text .= "$1 " if $1;
+    $text .= "by $2";
+    $text;
+  } @owners;
 
-  my $license_text = "This software is Copyright (c) by ".
-                      join (", and ", @owners) .
-                     " and released under the license of " .
-                      join (", and ", @licenses);
+  $license_text .= "This software is copyright (c) ". _join (@owners) . ".\n";
+  $license_text .= "\n";
+  $license_text .= "This software is available under " . _join (@licenses) . ".";
 
-  my $text = Pod::Elemental::Element::Nested->new({
+  push ($document->children, Pod::Elemental::Element::Nested->new({
     command  => "head" . $self->head,
-    content  => "LEGAL",
-    children => [
-      Pod::Elemental::Element::Nested->new({
-        command  => "head" . ($self->head +1),
-        content  => "Authors",
-        children => [Pod::Elemental::Element::Pod5::Ordinary->new({ content => $author_text })],
-      }),
-      Pod::Elemental::Element::Nested->new({
-        command  => "head" . ($self->head +1),
-        content  => "Copyright and License",
-        children => [Pod::Elemental::Element::Pod5::Ordinary->new({ content => $license_text })],
-      }),
-    ],
-  });
-  $document->children->push($text);
+    content  => @authors > 1? "AUTHORS" : "AUTHOR",
+    children => [Pod::Elemental::Element::Pod5::Ordinary->new({ content => $author_text })],
+  }));
+
+  push ($document->children, Pod::Elemental::Element::Nested->new({
+    command  => "head" . $self->head,
+    content  => "COPYRIGHT",
+    children => [Pod::Elemental::Element::Pod5::Ordinary->new({ content => $license_text })],
+  }));
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -130,13 +159,15 @@ __PACKAGE__->meta->make_immutable;
 __END__
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Pod::Weaver::Section::Legal::Complicated - add a pod section with multiple authors, copyright owners and licenses in a file basis
 
 =head1 VERSION
 
-version 1.00
+version 1.20
 
 =head1 SYNOPSIS
 
@@ -154,24 +185,22 @@ through a C<ppi_document>) with the following form:
 
   # AUTHOR:  John Doe <john.doe@otherside.com>
   # AUTHOR:  Mary Jane <mary.jane@thisside.com>
-  # OWNER:   University of Over Here
-  # OWNER:   Mary Jane
+  # OWNER:   2001-2005 University of Over Here
+  # OWNER:   2012 Mary Jane
   # LICENSE: GPL_3
 
 This example would generate the following POD:
 
-  =head1 Legal
-
-  =head2 Authors
+  =head2 AUTHORS
 
   John Doe <john.doe@otherside.com>
   Mary Jane <mary.jane@thisside.com>
 
-  =head2 Copyright and License
+  =head2 COPYRIGHT
 
-  This software is copyright of University of Over Here, and Mary Jane, and
-  released under the license of The GNU General Public License, Version 3,
-  June 2007
+  This software is copyright (c) 2001-2005 by University of Over Here, and 2012 by Mary Jane.
+
+  This software is available under The GNU General Public License, Version 3, June 2007.
 
 Note that this plugin makes a distinction between the authors (whoever wrote the
 code), and the actual copyright owners (possibly the person who paid them to
@@ -192,6 +221,9 @@ Defaults to false.
 Sets the heading level for the legal section. Defaults to 1.
 
 =for Pod::Coverage _extract_comments
+
+=for Pod::Coverage _join
+makes sure there's not too many "and" when there's too many entries
 
 =for Pod::Coverage weave_section
 

@@ -17,16 +17,19 @@ meta-spec:
 name: Pod-Weaver-Section-Legal-Complicated
 requires:
   List::MoreUtils: 0
+  Module::Load: 0
   Moose: 0
-  Moose::Autobox: 0
   MooseX::Types::Moose: 0
+  Pod::Elemental::Element::Nested: 0
+  Pod::Elemental::Element::Pod5::Ordinary: 0
   Pod::Weaver::Role::Section: 0
   namespace::autoclean: 0
   strict: 0
+  utf8: 0
   warnings: 0
 resources:
   bugtracker: https://github.com/carandraug/pod-weaver-section-legal-complicated/issues
   homepage: https://github.com/carandraug/pod-weaver-section-legal-complicated
   repository: git://github.com/carandraug/pod-weaver-section-legal-complicated.git
-version: 1.00
+version: 1.20
 x_authority: cpan:CDRAUG

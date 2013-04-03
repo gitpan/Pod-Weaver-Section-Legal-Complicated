@@ -9,6 +9,9 @@ dist.ini
 lib/Pod/Weaver/Section/Legal/Complicated.pm
 t/00-compile.t
 t/release-eol.t
+t/release-mojibake.t
 t/release-no-tabs.t
 t/release-pod-coverage.t
 t/release-pod-syntax.t
+weaver.ini
+xt/legal-complicated.t
