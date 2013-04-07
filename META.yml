@@ -23,6 +23,7 @@ requires:
   Pod::Elemental::Element::Nested: 0
   Pod::Elemental::Element::Pod5::Ordinary: 0
   Pod::Weaver::Role::Section: 0
+  Software::License: 0
   namespace::autoclean: 0
   strict: 0
   utf8: 0
@@ -31,5 +32,5 @@ resources:
   bugtracker: https://github.com/carandraug/pod-weaver-section-legal-complicated/issues
   homepage: https://github.com/carandraug/pod-weaver-section-legal-complicated
   repository: git://github.com/carandraug/pod-weaver-section-legal-complicated.git
-version: 1.20
+version: 1.21
 x_authority: cpan:CDRAUG

@@ -3,7 +3,7 @@ BEGIN {
   $Pod::Weaver::Section::Legal::Complicated::AUTHORITY = 'cpan:CDRAUG';
 }
 {
-  $Pod::Weaver::Section::Legal::Complicated::VERSION = '1.20';
+  $Pod::Weaver::Section::Legal::Complicated::VERSION = '1.21';
 }
 use utf8;
 ## Copyright (C) 2013 Carnë Draug <carandraug+dev@gmail.com>
@@ -140,13 +140,13 @@ sub weave_section {
   $license_text .= "\n";
   $license_text .= "This software is available under " . _join (@licenses) . ".";
 
-  push ($document->children, Pod::Elemental::Element::Nested->new({
+  push (@{$document->children}, Pod::Elemental::Element::Nested->new({
     command  => "head" . $self->head,
     content  => @authors > 1? "AUTHORS" : "AUTHOR",
     children => [Pod::Elemental::Element::Pod5::Ordinary->new({ content => $author_text })],
   }));
 
-  push ($document->children, Pod::Elemental::Element::Nested->new({
+  push (@{$document->children}, Pod::Elemental::Element::Nested->new({
     command  => "head" . $self->head,
     content  => "COPYRIGHT",
     children => [Pod::Elemental::Element::Pod5::Ordinary->new({ content => $license_text })],
@@ -167,7 +167,7 @@ Pod::Weaver::Section::Legal::Complicated - add a pod section with multiple autho
 
 =head1 VERSION
 
-version 1.20
+version 1.21
 
 =head1 SYNOPSIS
 
@@ -219,6 +219,13 @@ Defaults to false.
 =head2 head
 
 Sets the heading level for the legal section. Defaults to 1.
+
+=head1 NOTE ON DEPENDENCIES
+
+This plugin is dependent on the L<Software::License::*> module of the license
+being used. Since it is not feasible to list them all, only L<Software::License>
+is listed as dependency (of the distribution, even though it is not actually
+used directly.
 
 =for Pod::Coverage _extract_comments
 

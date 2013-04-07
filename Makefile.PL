@@ -31,12 +31,13 @@ my %WriteMakefileArgs = (
     "Pod::Elemental::Element::Nested" => 0,
     "Pod::Elemental::Element::Pod5::Ordinary" => 0,
     "Pod::Weaver::Role::Section" => 0,
+    "Software::License" => 0,
     "namespace::autoclean" => 0,
     "strict" => 0,
     "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.20",
+  "VERSION" => "1.21",
   "test" => {
     "TESTS" => "t/*.t"
   }
